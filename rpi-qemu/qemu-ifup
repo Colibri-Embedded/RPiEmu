@@ -1,0 +1,56 @@
+#!/bin/sh 
+# 
+# script to bring up the tun device in QEMU in bridged mode 
+# first parameter is name of tap device (e.g. tap0)
+#
+# some constants specific to the local host - change to suit your host
+#
+ETH0IPADDR=169.254.1.1
+#GATEWAY=169.254.1.1
+BROADCAST=169.254.1.255
+NETMASK=255.255.255.0
+
+ETH0DEV=p2p1
+
+LOCALNETDEV=br0
+WORLDNETDEV=p2p1
+
+/sbin/sysctl -w net.ipv4.ip_forward=1
+#
+# First take eth0 down, then bring it up with IP address 0.0.0.0 
+#
+#/sbin/ifconfig $ETH0DEV down
+#/sbin/ifconfig $ETH0DEV promisc up
+#/sbin/ifconfig $ETH0DEV 0.0.0.0 promisc up
+#
+# Bring up the tap device (name specified as first argument, by QEMU)
+#
+#/usr/sbin/openvpn --mktun --dev $1 --user `id -un`
+#/sbin/tunctl -u `id -un` -t $1
+/sbin/ifconfig $1 0.0.0.0 promisc up
+#
+# create the bridge between eth0 and the tap device
+#
+/usr/sbin/brctl addbr br0
+#/usr/sbin/brctl addif br0 $ETH0DEV
+/usr/sbin/brctl addif br0 $1
+
+# 
+# only a single bridge so loops are not possible, turn off spanning tree protocol
+#
+#/usr/sbin/brctl stp br0 off 
+# 
+# Bring up the bridge with ETH0IPADDR and add the default route 
+#
+/sbin/ifconfig br0 $ETH0IPADDR netmask ${NETMASK} broadcast ${BROADCAST}
+#/sbin/route add default gw ${GATEWAY}
+
+/sbin/iptables -t nat -A POSTROUTING -o ${WORLDNETDEV} -j MASQUERADE
+/sbin/iptables -A FORWARD -i ${WORLDNETDEV} -o ${LOCALNETDEV} -m state --state RELATED,ESTABLISHED -j ACCEPT
+/sbin/iptables -A FORWARD -i ${LOCALNETDEV} -o ${WORLDNETDEV} -j ACCEPT
+
+#dnsmasq --interface=br0 --bind-interfaces --dhcp-range=192.168.0.15,192.168.255.254
+#
+# stop firewall - comment this out if you don't use Firestarter
+#
+#/sbin/service firestarter stop 
