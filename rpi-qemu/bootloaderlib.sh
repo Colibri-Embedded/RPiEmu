@@ -27,6 +27,49 @@
 ## @version 0.2
 ########################################################################
 
+## @fn check_app()
+## Check if an application is available.
+## @return 0 if application is found, 1 otherwise
+check_app() {
+	$1 -h &> /dev/null
+	RETR=$?
+	if [ "x$RETR" == "x0" ]; then
+		return 0
+	else
+		$1 --help &> /dev/null
+		RETR=$?
+		if [ "x$RETR" == "x0" ]; then
+			return 0
+		else
+			return 1
+		fi
+	fi
+}
+
+## @fn check_tools()
+## Check if all tools are available.
+## @return 0 if all are found, 1 otherwise
+check_tools() {
+	TOOLS=(mkdir rm mount umount mktemp losetup fdisk iptables brctl ifconfig sysctl)
+	err=no
+	missing=()
+	for tool in ${TOOLS[@]}; do
+		check_app $tool
+		if [ "$?" != "0" ]; then
+			err=yes
+			missing=(${missing[@]} $tool)
+		fi
+	done
+	
+	if [ "$err" == "no" ]; then
+		echo "* All tools found."
+		return 0
+	else
+		echo "* Some tools are missing: ${missing[@]}"
+		exit 1
+	fi
+}
+
 ## @fn get_loopdev()
 ## Return a free loop device filename.
 ## @return free loop device file

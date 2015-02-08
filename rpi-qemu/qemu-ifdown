@@ -1,12 +1,14 @@
 #!/bin/sh 
 
+. ./tap.conf
+
 # 
 # Script to bring down and delete bridge br0 when QEMU exits 
 # 
 # Bring down eth0 and br0 
 #
 
-/sbin/ifconfig br0 down
-/usr/sbin/brctl delbr br0 
+/sbin/ifconfig ${LOCALNET_DEV} down
+/usr/sbin/brctl delbr ${LOCALNET_DEV} 
 /sbin/sysctl -w net.ipv4.ip_forward=0
 

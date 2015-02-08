@@ -71,6 +71,9 @@ done
 BOOT_DIR=$(mktemp -d)
 QEMU_ARGS="${SERIAL} -hda ${SDCARD_IMG} -clock dynticks -no-reboot -cpu arm1176 -m ${RAMSIZE} -M versatilepb ${NETWORK} ${USBDEV}"
 
+# Check if all the tools are available
+check_tools
+
 # Copy needed content from the SD card image to BOOT_DIR
 copy_boot_from_sdimage $SDCARD_IMG $SDCARD_BOOT_PARTNUM $BOOT_DIR
 
