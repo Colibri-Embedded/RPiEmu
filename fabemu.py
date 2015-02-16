@@ -14,7 +14,7 @@ os.system('cd rpi-qemu;./rpi-bootloader-qemu.sh -sdimg ../sdcard.img -tcpserial 
 # Wait for Qemu to boot-up and initiate the TCP connection
 # Qemu acts as a TCP server and will pause further execution
 # until a connection is made.
-sleep(0.5)
+sleep(1)
 
 print("=== Starting FABEmu v0.1 ===")
 

@@ -138,9 +138,18 @@ copy_boot_from_sdimage() {
 	###################################
 	# Parse the bootloader config.txt #
 	###################################
-	CMDLINE=$(cat $MNT/cmdline.txt)
-	KERNEL=$(config_get_kernel $MNT/config.txt)
-	INITRD=$(config_get_initramfs $MNT/config.txt)
+	CONFIG_TXT="$MNT/config.txt"
+	if [ -f "$MNT/config.txt.qemu" ]; then
+		CONFIG_TXT="$MNT/config.txt.qemu"
+	fi
+	CMDLINE_TXT=$MNT/cmdline.txt
+	if [ -f "$MNT/cmdline.txt.qemu" ]; then
+		CONFIG_TXT="$MNT/cmdline.txt.qemu"
+	fi
+	
+	CMDLINE=$(cat $CMDLINE_TXT)
+	KERNEL=$(config_get_kernel $CONFIG_TXT)
+	INITRD=$(config_get_initramfs $CONFIG_TXT)
 
 	# Copy the kernel to the rpi-bootloader directory
 	if [ "x$KERNEL" != "x" ]; then
