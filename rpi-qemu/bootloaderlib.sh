@@ -142,14 +142,20 @@ copy_boot_from_sdimage() {
 	if [ -f "$MNT/config.txt.qemu" ]; then
 		CONFIG_TXT="$MNT/config.txt.qemu"
 	fi
-	CMDLINE_TXT=$MNT/cmdline.txt
+	CMDLINE_TXT="$MNT/cmdline.txt"
 	if [ -f "$MNT/cmdline.txt.qemu" ]; then
-		CONFIG_TXT="$MNT/cmdline.txt.qemu"
+		CMDLINE_TXT="$MNT/cmdline.txt.qemu"
 	fi
-	
+		
 	CMDLINE=$(cat $CMDLINE_TXT)
 	KERNEL=$(config_get_kernel $CONFIG_TXT)
 	INITRD=$(config_get_initramfs $CONFIG_TXT)
+	
+	echo "CONFIG_TXT = $CONFIG_TXT"
+	echo "CMDLINE_TXT = $CMDLINE_TXT"
+	echo "KERNEL = $KERNEL"
+	echo "INITRD = $INITRD"
+	
 
 	# Copy the kernel to the rpi-bootloader directory
 	if [ "x$KERNEL" != "x" ]; then
@@ -162,6 +168,8 @@ copy_boot_from_sdimage() {
 		cp $MNT/$INITRD $3
 		QEMU_ARGS="${QEMU_ARGS} -initrd $BOOT_DIR/$INITRD"
 	fi
+	
+	sleep 1
 
 	umount $MNT
 	rm -rf $MNT

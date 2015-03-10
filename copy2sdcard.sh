@@ -28,3 +28,6 @@ cp -LR $SDCARD_SRC/* $MNT
 umount $MNT
 rm -rf $MNT
 losetup -d $LODEV
+
+sync
+

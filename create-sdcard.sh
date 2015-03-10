@@ -36,3 +36,6 @@ losetup $LODEV $SDCARD_IMG -o $(($start_sector * $sector_size))
 ${MKVFAT} -n boot $LODEV
 
 losetup -d $LODEV
+
+sync
+
