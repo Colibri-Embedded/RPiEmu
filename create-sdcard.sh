@@ -9,7 +9,11 @@ SDCARD_BOOT_PARTNUM=1
 FDISK=fdisk
 MKVFAT=mkfs.vfat
 
-dd if=/dev/zero of=${SDCARD_IMG} bs=1M count=${SDCARD_SIZE}
+if [ -f ${SDCARD_IMG} ]; then
+	dd if=/dev/zero of=${SDCARD_IMG} notrunc bs=1M count=1	
+else
+	dd if=/dev/zero of=${SDCARD_IMG} bs=1M count=${SDCARD_SIZE}
+fi
 
 echo "
 o
