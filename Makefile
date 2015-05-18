@@ -12,9 +12,11 @@ unexport QMAKESPEC
 unexport TERMINFO
 unexport MACHINE
 
-TOP_DIR			= .
+TOP_DIR			= $(PWD)
 BUILD_DIR		= $(TOP_DIR)/build
+MODULES_DIR		= $(BUILD_DIR)/modules
 SDCARD_DIR		= $(TOP_DIR)/sdcard
+BUNDLES_DIR		= $(TOP_DIR)/sdcard/bundles
 
 BUILD_DIR_STAMP = $(BUILD_DIR)/.build_dir_stamp
 SDCARD_DIR_STAMP = $(BUILD_DIR)/.sdcard_dir_stamp
@@ -25,12 +27,17 @@ TOOLCHAIN_STAMP = $(BUILD_DIR)/.toolchain_stamp
 SOURCES_STAMP = $(BUILD_DIR)/.sources_stamp
 EXTRACT_STAMP = $(BUILD_DIR)/.extracted_stamp
 PATCH_STAMP = $(BUILD_DIR)/.patched_stamp
+MODULES_STAMP = $(BUILD_DIR)/.modules_stamp
 
 COLIBRI_BUILDROOT_ROOT 	?= ../colibri-buildroot
 COLIBRI_FABTOTUM_ROOT 	?= ../colibri-fabtotum
 DOWNLOAD_DIR			?= ../downloads
 
 COLIBRI_HOST_DIR		= ../../$(COLIBRI_BUILDROOT_ROOT)/output/host
+
+# xz, gzip, lzo, lz4, lzma
+SQFS_COMPRESSION		= xz
+SQFS_ARGS				= -comp $(SQFS_COMPRESSION) -b 512K -no-xattrs -noappend -all-root
 
 KERNEL_VERSION			?= 3.16.y
 KERNEL_SOURCE 			= http://github.com/raspberrypi/linux/archive/rpi-$(KERNEL_VERSION).tar.gz
@@ -51,9 +58,10 @@ KERNEL_MAKE_FLAGS = \
 	ARCH=$(KERNEL_ARCH) \
 	INSTALL_MOD_PATH=$(LINUX_TARGET_DIR) \
 	CROSS_COMPILE="$(TARGET_CROSS)" \
-	DEPMOD=$(COLIBRI_HOST_DIR)/sbin/depmod
+	DEPMOD=$(COLIBRI_HOST_DIR)/sbin/depmod \
+	USER_EXTRA_CFLAGS="-DCONFIG_LITTLE_ENDIAN"
 
-all:
+all: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
 
 $(BUILD_DIR_STAMP):
 	mkdir -p $(BUILD_DIR)
@@ -98,13 +106,29 @@ $(EXTRACT_STAMP): $(TOOLCHAIN_STAMP)
 	cp $(KERNEL_CONFIG) $(KERNEL_BUILD_DIR)/.config
 	touch $@
 
-kernel: $(BUILD_DIR_STAMP) $(SDCARD_DIR_STAMP) $(EXTRACT_STAMP)
+$(KERNEL_IMAGE): $(BUILD_DIR_STAMP) $(SDCARD_DIR_STAMP) $(EXTRACT_STAMP) $(KERNEL_BUILD_DIR)/.config
 	$(TARGET_MAKE_ENV) $(KERNEL_MAKE_FLAGS) make -C $(KERNEL_BUILD_DIR)
 	cp $(KERNEL_BUILD_DIR)/arch/$(KERNEL_ARCH)/boot/zImage $(KERNEL_IMAGE)
 	
+$(MODULES_STAMP): $(KERNEL_IMAGE)
+	$(TARGET_MAKE_ENV) $(KERNEL_MAKE_FLAGS) make -C $(KERNEL_BUILD_DIR) \
+		INSTALL_MOD_PATH=$(MODULES_DIR) \
+		INSTALL_MOD_STRIP=1 \
+		modules_install
+	touch $@
+		
+$(BUNDLES_DIR)/002-kernel-modules-qemu.cb: $(MODULES_STAMP)
+	mkdir -p $(BUNDLES_DIR)
+	mksquashfs $(MODULES_DIR) $@ $(SQFS_ARGS)
+
+menuconfig:
+	$(TARGET_MAKE_ENV) $(KERNEL_MAKE_FLAGS) make -C $(KERNEL_BUILD_DIR) menuconfig
 
 clean:
 	rm -rf $(BUILD_DIR)
+	
+distclean: clean
+	rm $(KERNEL_IMAGE)
 
 help:
 	@echo "Cleaning:"
