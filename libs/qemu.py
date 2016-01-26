@@ -38,17 +38,15 @@ class QemuSocket:
 		#	totalsent = totalsent + sent
 
 	def serial_receive(self):
-		data = self.sock.recv(self.BUFFER_SIZE)
+		try:
+			data = self.sock.recv(self.BUFFER_SIZE)
+		except socket.error, (value,message): 
+			raise Exception('Socket Error')
+		
 		if data == b'':
 			return data
-			
-		filtered = ''
-			
-		for b in data:
-			if b != 0:
-				filtered += chr(b)
-			
-		return filtered
+		
+		return data.replace('\x00','')
         #~ chunks = []
         #~ bytes_recd = 0
         #~ while bytes_recd < MSGLEN:

@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
-import os, queue
+import os, Queue
 from time import sleep
 
 # Import FABEmu specific packages
@@ -36,8 +36,9 @@ chunks=''
 
 while True:
 	# Receive data from QEMU UART
-	data = qemu.serial_receive()
-	if data == b'':
+	try:
+		data = qemu.serial_receive()
+	except Exception as e:
 		break
 	
 	# Accumulate serial data

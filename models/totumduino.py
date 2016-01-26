@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
-from queue import Queue, Empty
+from Queue import Queue, Empty
 import threading
 import time
 from time import sleep

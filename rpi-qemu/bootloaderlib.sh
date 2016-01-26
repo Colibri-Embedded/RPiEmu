@@ -27,6 +27,9 @@
 ## @version 0.2
 ########################################################################
 
+FDISK=fdisk
+MKVFAT=mkfs.vfat
+
 ## @fn check_app()
 ## Check if an application is available.
 ## @return 0 if application is found, 1 otherwise
@@ -124,7 +127,8 @@ copy_boot_from_sdimage() {
 	LODEV=$(get_loopdev)
 	MNT=$(mktemp -d)
 	# Get SDCard image info
-	sector_size=$(fdisk -lu $1 | grep "Units: sectors" | sed -e 's/.*=//;s/ bytes//')
+	#sector_size=$(fdisk -lu $1 | grep "Units: sectors" | sed -e 's/.*=//;s/ bytes//')
+	sector_size=$( ${FDISK} -lu $SDCARD_IMG | grep "Units = sectors" | sed -e 's/.*=//;s/ bytes//')
 	start_sector=$(fdisk -lu $1 | grep "${1}${2}" | awk '{print $2}' )
 	
 	# Create rpi-bootloader directory
@@ -205,4 +209,11 @@ copy_to_sdimage() {
 ## @param $1 Boot directory
 bootloader_cleanup() {
 	rm -rf $1
+}
+
+check_root() {
+	if ! [ $(id -u) = 0 ]; then
+	   echo "You are not root. Please use sudo $1"
+	   exit 1
+	fi
 }
