@@ -23,7 +23,7 @@ mount $LODEV $MNT
 
 rm -rf $MNT/earlyboot/*
 cp -LR $SDCARD_SRC/earlyboot/* $MNT/earlyboot
-cp -LR $SDCARD_SRC/initramfs.img $/MNT
+cp -LR $SDCARD_SRC/initramfs.img $MNT/
 
 sync
 
