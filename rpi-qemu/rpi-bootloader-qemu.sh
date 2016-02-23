@@ -41,6 +41,7 @@ SDCARD_IMG="sdcard.img"
 SDCARD_BOOT_PARTNUM=1
 RAMSIZE=256
 SERIAL=
+MODEL_PID=
 
 while (( "$#" )); do
 	case $1 in
@@ -59,6 +60,10 @@ while (( "$#" )); do
 		-tcpserial)
 			shift
 			SERIAL="-serial tcp::$1,server"
+			;;
+		-modelpid)
+			shift
+			MODEL_PID=$1
 			;;
 		*)
 			echo "Unknown parameter \'$1\'"
@@ -83,4 +88,7 @@ qemu-system-arm ${QEMU_ARGS} -append "${CMDLINE}"
 
 # Cleanup the boot directory
 bootloader_cleanup $BOOT_DIR
+
+# Stop the model simulator
+kill -9 ${MODEL_PID}
 

@@ -155,6 +155,8 @@ copy_boot_from_sdimage() {
 	KERNEL=$(config_get_kernel $CONFIG_TXT)
 	INITRD=$(config_get_initramfs $CONFIG_TXT)
 	
+	KERNEL="kernel-qemu.img"
+	
 	echo "CONFIG_TXT = $CONFIG_TXT"
 	echo "CMDLINE_TXT = $CMDLINE_TXT"
 	echo "KERNEL = $KERNEL"

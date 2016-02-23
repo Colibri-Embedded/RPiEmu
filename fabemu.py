@@ -9,7 +9,9 @@ from models.totumduino import TotumDuino
 from models.fabtotum import FABTotum
 
 # Start Qemu with Serial over TCP (on port 4444)
-os.system('cd rpi-qemu;./rpi-bootloader-qemu.sh -sdimg ../sdcard.img -tcpserial 4444 &')
+curr_pid = os.getpid()
+print "pid:",curr_pid
+os.system('cd rpi-qemu;./rpi-bootloader-qemu.sh -sdimg ../sdcard.img -tcpserial 4444 -modelpid ' + str(curr_pid) + ' &')
 
 # Wait for Qemu to boot-up and initiate the TCP connection
 # Qemu acts as a TCP server and will pause further execution
