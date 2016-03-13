@@ -129,10 +129,18 @@ clean:
 	
 distclean: clean
 	rm $(KERNEL_IMAGE)
+	
+run: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
+	sudo ./fabemu.py
+	
+update-fabui:
+	sudo ./update-fabui.sh
+	
 
 help:
 	@echo "Cleaning:"
-	@echo "    clean                  - delete all files created by build"
+	@echo "    clean                  - delete all temporary build files"
+	@echo "    distclean              - delete all files created by build (kenrel, modules, bundles)"
 	@echo ""
 	@echo "Build:"
 	@echo "    all                    - make world"
