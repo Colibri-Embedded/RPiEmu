@@ -26,8 +26,19 @@
 ## @copyright GPLv2
 ## @version 0.2
 ########################################################################
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if ([ -h "${SCRIPT_PATH}" ]) then
+	while([ -h "${SCRIPT_PATH}" ]) do
+		SCRIPT_PATH=`readlink "${SCRIPT_PATH}"` 
+	done
+fi
+pushd . > /dev/null
+cd `dirname ${SCRIPT_PATH}` > /dev/null
+SCRIPT_PATH=`pwd`;
+popd  > /dev/null
+########################################################################
 
-. bootloaderlib.sh
+. ${SCRIPT_PATH}/bootloaderlib.sh
 
 #NETWORK="-net nic -net user,hostfwd=tcp::50022-:22,hostfwd=tcp::80-:80"
 TAP_IFUP=${PWD}/qemu-ifup

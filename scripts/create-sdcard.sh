@@ -1,6 +1,17 @@
 #!/bin/bash
-
-. ./rpi-qemu/bootloaderlib.sh
+########################################################################
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if ([ -h "${SCRIPT_PATH}" ]) then
+	while([ -h "${SCRIPT_PATH}" ]) do
+		SCRIPT_PATH=`readlink "${SCRIPT_PATH}"` 
+	done
+fi
+pushd . > /dev/null
+cd `dirname ${SCRIPT_PATH}` > /dev/null
+SCRIPT_PATH=`pwd`;
+popd  > /dev/null
+########################################################################
+. ${SCRIPT_PATH}/../rpi-qemu/bootloaderlib.sh
 
 check_root $0
 
@@ -8,8 +19,30 @@ SDCARD_SIZE="4096"
 SDCARD_IMG="sdcard.img"
 SDCARD_BOOT_PARTNUM=1
 
+while (( "$#" )); do
+	case $1 in
+		-sdimg)
+			shift
+			SDCARD_IMG=$1
+			;;
+		-size)
+			shift
+			SDCARD_SIZE=$1
+			;;
+		-bootpart)
+			shift
+			SDCARD_BOOT_PARTNUM=$1
+			;;
+		*)
+			echo "Unknown parameter \'$1\'"
+			;;
+	esac
+	
+	shift
+done
+
 if [ -f ${SDCARD_IMG} ]; then
-	dd if=/dev/zero of=${SDCARD_IMG} notrunc bs=1M count=1	
+	dd if=/dev/zero of=${SDCARD_IMG} conv=notrunc bs=1M count=1	
 else
 	dd if=/dev/zero of=${SDCARD_IMG} bs=1M count=${SDCARD_SIZE}
 fi

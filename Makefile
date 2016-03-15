@@ -17,6 +17,7 @@ BUILD_DIR		= $(TOP_DIR)/build
 MODULES_DIR		= $(BUILD_DIR)/modules
 SDCARD_DIR		= $(TOP_DIR)/sdcard
 BUNDLES_DIR		= $(TOP_DIR)/sdcard/bundles
+SCRIPTS_DIR		= $(TOP_DIR)/scripts
 
 BUILD_DIR_STAMP = $(BUILD_DIR)/.build_dir_stamp
 SDCARD_DIR_STAMP = $(BUILD_DIR)/.sdcard_dir_stamp
@@ -36,7 +37,7 @@ DOWNLOAD_DIR			?= ../downloads
 COLIBRI_HOST_DIR		= ../../$(COLIBRI_BUILDROOT_ROOT)/output/host
 
 # xz, gzip, lzo, lz4, lzma
-SQFS_COMPRESSION		= xz
+SQFS_COMPRESSION		?= xz
 SQFS_ARGS				= -comp $(SQFS_COMPRESSION) -b 512K -no-xattrs -noappend -all-root
 
 KERNEL_VERSION			?= 3.16.y
@@ -60,8 +61,21 @@ KERNEL_MAKE_FLAGS = \
 	CROSS_COMPILE="$(TARGET_CROSS)" \
 	DEPMOD=$(COLIBRI_HOST_DIR)/sbin/depmod \
 	USER_EXTRA_CFLAGS="-DCONFIG_LITTLE_ENDIAN"
+	
+# SDCARD parameters
+SDCARD_SIZE				?= 	4096
+SDCARD_IMG				?=	sdcard.img
+SDCARD_LOG				?=	sdcard.log
+#SDCARD_BOOT_PARTNUM		?=	1
+
+.PHONY: all run sdcard update-fabui check-root-permissions
 
 all: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
+
+check-root-permissions:
+	@echo -n "Checking for root permissions..."
+	@[ $(shell id -u) = 0 ] || exit 1
+	@echo "YES"
 
 $(BUILD_DIR_STAMP):
 	mkdir -p $(BUILD_DIR)
@@ -128,20 +142,56 @@ clean:
 	rm -rf $(BUILD_DIR)
 	
 distclean: clean
-	rm $(KERNEL_IMAGE)
+	rm -rf $(KERNEL_IMAGE)
+	rm -rf $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
+	rm -rf $(SDCARD_IMG)
 	
 run: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
 	sudo ./fabemu.py
-	
+
+sdcard:
+	sudo $(SCRIPTS_DIR)/create-sdcard.sh -sdimg $(SDCARD_IMG) -size $(SDCARD_SIZE)	&> $(SDCARD_LOG)
+	sudo $(SCRIPTS_DIR)/copy2sdcard.sh -sdimg $(SDCARD_IMG)	&> $(SDCARD_LOG)
+
+update-boot:
+	@echo TODO
+
+update-earlyboot:
+	@echo TODO
+
+update-bundles:
+	@echo TODO
+
 update-fabui:
-	sudo ./update-fabui.sh
+	@echo TODO
 	
 
 help:
-	@echo "Cleaning:"
-	@echo "    clean                  - delete all temporary build files"
-	@echo "    distclean              - delete all files created by build (kenrel, modules, bundles)"
+	@echo "== Cleaning =="
+	@echo "  clean                  - Delete all temporary build files"
+	@echo "  distclean              - Delete all files created by build (kenrel, modules, bundles)"
 	@echo ""
-	@echo "Build:"
-	@echo "    all                    - make world"
-	@echo "    toolchain              - build toolchain"
+	@echo "== Build =="
+	@echo "  all                    - Make world"
+	@echo "  + KERNEL_VERSION       - Kernel version (default: 3.16.y)"
+	@echo ""
+	@echo "  menuconfig             - Start kernel menuconfig"
+	@echo ""
+	@echo "== Emulator =="
+	@echo "  run                    - Run FABEmu"
+	@echo ""
+	@echo "== SDcard =="
+	@echo "  sdcard                 - Create/repartition sdcard image and copy the content to boot partition."
+	@echo "                           Warning: This will erase the content of existing sdcard image."
+	@echo "  + SDCARD_IMG           - sdcard image file (default: sdcard.img)"
+	@echo "  + SDCARD_SIZE          - sdcard size in MB (default: 4096)" 
+	@echo ""
+	@echo "  update-boot            - Update content of 'boot' partition."
+	@echo "                           This will overwrite all configuration files and initiate"
+	@echo "                           firstboot procedures on the next boot."
+	@echo "  update-earlyboot       - Update earlyboot files."
+	@echo "  update-bundles         - Update bundle files on 'bundles' partition."
+	@echo "  update-fabui           - Update FAB-UI bundle on 'bundles' partition. "
+	@echo ""
+	@echo "  example:"
+	@echo "    make sdcard SDCARD_SIZE=8096"
