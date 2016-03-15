@@ -147,24 +147,23 @@ distclean: clean
 	rm -rf $(SDCARD_IMG)
 	
 run: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
-	sudo ./fabemu.py
+	sudo ./fabemu.py || exit 0
 
 sdcard:
 	sudo $(SCRIPTS_DIR)/create-sdcard.sh -sdimg $(SDCARD_IMG) -size $(SDCARD_SIZE)	&> $(SDCARD_LOG)
-	sudo $(SCRIPTS_DIR)/copy2sdcard.sh -sdimg $(SDCARD_IMG)	&> $(SDCARD_LOG)
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot
 
 update-boot:
-	@echo TODO
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot
 
 update-earlyboot:
-	@echo TODO
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content earlyboot
 
 update-bundles:
-	@echo TODO
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content bundles
 
 update-fabui:
-	@echo TODO
-	
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content fabui
 
 help:
 	@echo "== Cleaning =="

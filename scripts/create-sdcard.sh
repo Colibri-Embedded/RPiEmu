@@ -17,7 +17,7 @@ check_root $0
 
 SDCARD_SIZE="4096"
 SDCARD_IMG="sdcard.img"
-SDCARD_BOOT_PARTNUM=1
+SDCARD_PARTNUM=1
 
 while (( "$#" )); do
 	case $1 in
@@ -29,9 +29,9 @@ while (( "$#" )); do
 			shift
 			SDCARD_SIZE=$1
 			;;
-		-bootpart)
+		-sdpart)
 			shift
-			SDCARD_BOOT_PARTNUM=$1
+			SDCARD_PARTNUM=$1
 			;;
 		*)
 			echo "Unknown parameter \'$1\'"
@@ -69,7 +69,7 @@ v=${v[2]}
 
 sector_size=$( ${FDISK} -lu $SDCARD_IMG | grep "Units = sectors" | sed -e 's/.*=//;s/ bytes//')
 #sector_size=$( ${FDISK} -lu $SDCARD_IMG | grep "Units: sectors" | sed -e 's/.*=//;s/ bytes//')
-start_sector=$( ${FDISK} -lu $SDCARD_IMG | grep "${SDCARD_IMG}${SDCARD_BOOT_PARTNUM}" | awk '{print $2}' )
+start_sector=$( ${FDISK} -lu $SDCARD_IMG | grep "${SDCARD_IMG}${SDCARD_PARTNUM}" | awk '{print $2}' )
 
 losetup $LODEV $SDCARD_IMG -o $(($start_sector * $sector_size))
 
