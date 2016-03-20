@@ -34,7 +34,7 @@ while (( "$#" )); do
 			;;
 		-sdpart)
 			shift
-			SDCARD_BOOT_PARTNUM=$1
+			SDCARD_PARTNUM=$1
 			;;
 		-fabui_src)
 			shift
