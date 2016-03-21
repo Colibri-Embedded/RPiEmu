@@ -107,6 +107,12 @@ case $SDCARD_CONTENT in
 		# Copy new FABUI bundle
 		cp -R ${FABUI_SRC}/090-fabui-* $MNT
 		;;
+	enable-dbgconsole)
+		sed -i $MNT/cmdline.txt -e 's/colibri.debug_console=0/colibri.debug_console=1/'
+		;;
+	disable-dbgconsole)
+		sed -i $MNT/cmdline.txt -e 's/colibri.debug_console=1/colibri.debug_console=0/'
+		;;
 esac
 
 sync

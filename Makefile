@@ -164,6 +164,12 @@ update-bundles:
 
 update-fabui:
 	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content fabui
+	
+enable-dbgconsole:
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content enable-dbgconsole
+	
+disable-dbgconsole:
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content disable-dbgconsole
 
 help:
 	@echo "== Cleaning =="
