@@ -78,6 +78,7 @@ case $SDCARD_CONTENT in
 		# Copy FABUI bundle
 		cp -LRf $FABUI_SRC/*.cb $MNT/bundles/
 		cp -LRf $FABUI_SRC/*.cb.md5sum $MNT/bundles/
+		du -sh $MNT
 		;;
 	earlyboot)
 		rm -rf $MNT/earlyboot
@@ -85,6 +86,8 @@ case $SDCARD_CONTENT in
 		
 		rm -rf $MNT/initramfs.img
 		cp -LR $SDCARD_SRC/initramfs.img $MNT/
+		
+		du -sh $MNT
 		;;
 	bundles)
 		# Remove all bundles
@@ -100,12 +103,15 @@ case $SDCARD_CONTENT in
 		# Copy FABUI bundle
 		cp -LRf $FABUI_SRC/*.cb $MNT/
 		cp -LRf $FABUI_SRC/*.cb.md5sum $MNT/
+		
+		du -sh $MNT
 		;;
 	fabui)
 		# Remove old FABUI bundle
 		rm -rf $MNT/*-fabui-*
 		# Copy new FABUI bundle
 		cp -R ${FABUI_SRC}/090-fabui-* $MNT
+		
 		;;
 	enable-dbgconsole)
 		sed -i $MNT/cmdline.txt -e 's/colibri.debug_console=0/colibri.debug_console=1/'

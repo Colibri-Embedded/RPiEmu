@@ -73,7 +73,7 @@ start_sector=$( ${FDISK} -lu $SDCARD_IMG | grep "${SDCARD_IMG}${SDCARD_PARTNUM}"
 
 losetup $LODEV $SDCARD_IMG -o $(($start_sector * $sector_size))
 
-${MKVFAT} -n boot $LODEV
+${MKVFAT} -n BOOT $LODEV
 
 losetup -d $LODEV
 

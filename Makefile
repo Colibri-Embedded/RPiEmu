@@ -37,18 +37,22 @@ DOWNLOAD_DIR			?= ../downloads
 COLIBRI_HOST_DIR		= ../../$(COLIBRI_BUILDROOT_ROOT)/output/host
 
 # xz, gzip, lzo, lz4, lzma
-SQFS_COMPRESSION		?= xz
+SQFS_COMPRESSION		?= lzo
 SQFS_ARGS				= -comp $(SQFS_COMPRESSION) -b 512K -no-xattrs -noappend -all-root
 
-KERNEL_VERSION			?= 3.16.y
+#~ KERNEL_VERSION			?= 3.16.y
+KERNEL_VERSION			?= 4.1.y
+#~ KERNEL_VERSION			?= 4.4.y
 KERNEL_SOURCE 			= http://github.com/raspberrypi/linux/archive/rpi-$(KERNEL_VERSION).tar.gz
 KERNEL_BUILD_DIR		= $(BUILD_DIR)/linux-rpi-$(KERNEL_VERSION)
-KERNEL_TAR				= $(DOWNLOAD_DIR)/linux-rpi-$(KERNEL_VERSION).tar.gz
+KERNEL_TAR				= $(DOWNLOAD_DIR)/rpi-$(KERNEL_VERSION).tar.gz
 KERNEL_PATCH_DIR		= $(COLIBRI_FABTOTUM_ROOT)/board/fabtotum/v1/$(KERNEL_VERSION)
 KERNEL_PATCHES			= $(wildcard $(KERNEL_PATCH_DIR)/*.patch)
 KERNEL_CONFIG			= $(COLIBRI_FABTOTUM_ROOT)/board/fabtotum/v1/linux-$(KERNEL_VERSION)-qemu.config
 KERNEL_ARCH				= arm
 KERNEL_IMAGE			= $(SDCARD_DIR)/kernel-qemu.img
+
+DEFCONFIG				?=
 
 # Quotes are needed for spaces and all in the original PATH content.
 COLIBRI_PATH 	= "$(COLIBRI_HOST_DIR)/bin:$(COLIBRI_HOST_DIR)/sbin:$(COLIBRI_HOST_DIR)/usr/bin:$(COLIBRI_HOST_DIR)/usr/sbin:$(PATH)"
@@ -77,6 +81,12 @@ check-root-permissions:
 	@[ $(shell id -u) = 0 ] || exit 1
 	@echo "YES"
 
+linux-menuconfig: $(EXTRACT_STAMP)
+	$(TARGET_MAKE_ENV) $(KERNEL_MAKE_FLAGS) make -C $(KERNEL_BUILD_DIR) menuconfig
+
+linux-defconfig:  $(EXTRACT_STAMP)
+	$(TARGET_MAKE_ENV) $(KERNEL_MAKE_FLAGS) make -C $(KERNEL_BUILD_DIR) $(DEFCONFIG)
+	
 $(BUILD_DIR_STAMP):
 	mkdir -p $(BUILD_DIR)
 	touch $@
@@ -178,7 +188,7 @@ help:
 	@echo ""
 	@echo "== Build =="
 	@echo "  all                    - Make world"
-	@echo "  + KERNEL_VERSION       - Kernel version (default: 3.16.y)"
+	@echo "  + KERNEL_VERSION       - Kernel version (default: " $(KERNEL_VERSION) ")"
 	@echo ""
 	@echo "  menuconfig             - Start kernel menuconfig"
 	@echo ""
@@ -197,6 +207,9 @@ help:
 	@echo "  update-earlyboot       - Update earlyboot files."
 	@echo "  update-bundles         - Update bundle files on 'bundles' partition."
 	@echo "  update-fabui           - Update FAB-UI bundle on 'bundles' partition. "
+	@echo "  "
+	@echo "  enable-dbgconsole      - Enable earlyboot debug console. "
+	@echo "  disable-dbgconsole     - Disable earlyboot debug console. "
 	@echo ""
 	@echo "  example:"
 	@echo "    make sdcard SDCARD_SIZE=8096"
