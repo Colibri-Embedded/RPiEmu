@@ -276,6 +276,8 @@ class TotumDuino:
 			pass
 		elif cmd[0] == 'M732':
 			pass
+		elif cmd[0] == 'M734':
+			pass
 		elif cmd[0] == 'M740':
 			pass
 		elif cmd[0] == 'M741':
@@ -287,6 +289,8 @@ class TotumDuino:
 		elif cmd[0] == 'M744':
 			pass
 		elif cmd[0] == 'M745':
+			pass
+		elif cmd[0] == 'M747':
 			pass
 		elif cmd[0] == 'M750':
 			pass
@@ -339,6 +343,8 @@ class TotumDuino:
 		elif cmd[0] == 'M791':
 			pass
 		elif cmd[0] == 'M792':
+			pass
+		elif cmd[0] == 'M793':
 			pass
 		elif cmd[0] == 'M907':
 			pass
