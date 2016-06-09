@@ -53,14 +53,26 @@ while (( "$#" )); do
 done
 
 # Get SDCard image info
-sector_size=$( ${FDISK} -lu $SDCARD_IMG | grep "Units = sectors" | sed -e 's/.*=//;s/ bytes//')
-#sector_size=$(fdisk -lu $SDCARD_IMG | grep "Units: sectors" | sed -e 's/.*=//;s/ bytes//')
-start_sector=$( ${FDISK} -lu $SDCARD_IMG | grep "${SDCARD_IMG}${SDCARD_PARTNUM}" | awk '{print $2}' )
 
-LODEV=$(get_loopdev)
-MNT=$(mktemp -d)
+if [ -f ${SDCARD_IMG} ]; then
+	# Regular file sdcard image
+	sector_size=$( ${FDISK} -lu $SDCARD_IMG | grep "Units = sectors" | sed -e 's/.*=//;s/ bytes//')
+	#sector_size=$(fdisk -lu $SDCARD_IMG | grep "Units: sectors" | sed -e 's/.*=//;s/ bytes//')
+	start_sector=$( ${FDISK} -lu $SDCARD_IMG | grep "${SDCARD_IMG}${SDCARD_PARTNUM}" | awk '{print $2}' )
 
-losetup $LODEV $SDCARD_IMG -o $(($start_sector * $sector_size))
+	LODEV=$(get_loopdev)
+	MNT=$(mktemp -d)
+
+	losetup $LODEV $SDCARD_IMG -o $(($start_sector * $sector_size))
+elif [ -b ${SDCARD_IMG} ]; then
+	# Block device, real hw
+	LODEV=${SDCARD_IMG}${SDCARD_PARTNUM}
+	MNT=$(mktemp -d)
+else
+	echo "Error: unsupported sdcard image type"
+	exit 1
+fi
+
 mount $LODEV $MNT
 
 case $SDCARD_CONTENT in
@@ -73,8 +85,13 @@ case $SDCARD_CONTENT in
 		else
 			echo "No colibri-buildroot found. Using only local ./sdcard content."
 		fi
+		
 		# Copy sdcard content from local ./sdcard directory
-		cp -R sdcard/* $MNT
+		# Only if it is for qemu
+		if [ -f ${SDCARD_IMG} ]; then
+			cp -R sdcard/* $MNT
+		fi
+		
 		# Copy FABUI bundle
 		cp -LRf $FABUI_SRC/*.cb $MNT/bundles/
 		cp -LRf $FABUI_SRC/*.cb.md5sum $MNT/bundles/
@@ -99,7 +116,11 @@ case $SDCARD_CONTENT in
 			echo "No colibri-buildroot found. Using only local ./sdcard content."
 		fi
 		# Copy sdcard content from local ./sdcard directory
-		cp -R sdcard/bundles/* $MNT/
+		# Only if it is for qemu
+		if [ -f ${SDCARD_IMG} ]; then
+			cp -R sdcard/bundles/* $MNT/
+		fi
+		
 		# Copy FABUI bundle
 		cp -LRf $FABUI_SRC/*.cb $MNT/
 		cp -LRf $FABUI_SRC/*.cb.md5sum $MNT/
@@ -115,9 +136,11 @@ case $SDCARD_CONTENT in
 		;;
 	enable-dbgconsole)
 		sed -i $MNT/cmdline.txt -e 's/colibri.debug_console=0/colibri.debug_console=1/'
+		sleep 1
 		;;
 	disable-dbgconsole)
 		sed -i $MNT/cmdline.txt -e 's/colibri.debug_console=1/colibri.debug_console=0/'
+		sleep 1
 		;;
 esac
 
@@ -125,4 +148,7 @@ sync
 
 umount $MNT
 rm -rf $MNT
-losetup -d $LODEV
+
+if [ -f ${SDCARD_IMG} ]; then
+	losetup -d $LODEV
+fi
