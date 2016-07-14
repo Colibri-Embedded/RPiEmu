@@ -32,6 +32,10 @@ while (( "$#" )); do
 			shift
 			SDCARD_SIZE=$1
 			;;
+		-colibri_sdcard)
+			shift
+			SDCARD_SRC=$1
+			;;
 		-sdpart)
 			shift
 			SDCARD_PARTNUM=$1
@@ -68,6 +72,11 @@ elif [ -b ${SDCARD_IMG} ]; then
 	# Block device, real hw
 	LODEV=${SDCARD_IMG}${SDCARD_PARTNUM}
 	MNT=$(mktemp -d)
+	
+	# umount all SDCARD_IMG partitions
+	for p in ls ${SDCARD_IMG}*; do
+		umount -l ${p} &> /dev/null
+	done
 else
 	echo "Error: unsupported sdcard image type"
 	exit 1

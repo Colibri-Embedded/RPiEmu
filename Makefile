@@ -30,11 +30,12 @@ EXTRACT_STAMP = $(BUILD_DIR)/.extracted_stamp
 PATCH_STAMP = $(BUILD_DIR)/.patched_stamp
 MODULES_STAMP = $(BUILD_DIR)/.modules_stamp
 
-COLIBRI_BUILDROOT_ROOT 	?= ../colibri-buildroot
-COLIBRI_FABTOTUM_ROOT 	?= ../colibri-fabtotum
-DOWNLOAD_DIR			?= ../downloads
+COLIBRI_BUILDROOT_OUTPUT	?= ../colibri-buildroot/output
+COLIBRI_BUILDROOT_SDCARD	?= $(COLIBRI_BUILDROOT_OUTPUT)/sdcard
+COLIBRI_FABTOTUM_ROOT 		?= ../colibri-fabtotum
+DOWNLOAD_DIR				?= ../downloads
 
-COLIBRI_HOST_DIR		= ../../$(COLIBRI_BUILDROOT_ROOT)/output/host
+COLIBRI_HOST_DIR		= ../../$(COLIBRI_BUILDROOT_ROOT)/host
 
 # xz, gzip, lzo, lz4, lzma
 SQFS_COMPRESSION		?= lzo
@@ -161,19 +162,19 @@ run: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
 
 sdcard:
 	sudo $(SCRIPTS_DIR)/create-sdcard.sh -sdimg $(SDCARD_IMG) -size $(SDCARD_SIZE)	&> $(SDCARD_LOG)
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-boot:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-earlyboot:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content earlyboot
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content earlyboot -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-bundles:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content bundles
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content bundles -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-fabui:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content fabui
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content fabui -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 	
 enable-dbgconsole:
 	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content enable-dbgconsole

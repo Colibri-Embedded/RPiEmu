@@ -41,6 +41,11 @@ while (( "$#" )); do
 	shift
 done
 
+# TODO
+# check if devices are not system disks
+#/dev/sda1 on /boot type xfs (rw,relatime,seclabel,attr2,inode64,noquota)
+#/dev/sdb1 on /mnt/development type ext4 (rw,noatime,seclabel,data=ordered)
+
 if [ -e ${SDCARD_IMG} ]; then
 	# real hw, partitions have probably been mounted
 	if [ -b ${SCARD_IMG} ]; then
