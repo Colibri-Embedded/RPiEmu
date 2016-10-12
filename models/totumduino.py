@@ -29,7 +29,7 @@ class TotumDuino:
 		while self.running:
 			# For now used to relax the CPU as the while loop would 
 			# force it to work with high load for nothing.
-			sleep(1)
+			sleep(10)
 					
 	##
 	## UART0 transfer handler.
@@ -40,7 +40,9 @@ class TotumDuino:
 		reply=''
 		cmd = msg.split(" ")			
 			
-		if cmd[0] == 'G1':
+		if cmd[0] == 'G0':
+			pass
+		elif cmd[0] == 'G1':
 			pass
 		elif cmd[0] == 'G2':
 			pass
@@ -355,7 +357,6 @@ class TotumDuino:
 		elif cmd[0] == 'M999':
 			pass
 
-			
 		else:
 			return None
 

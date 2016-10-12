@@ -20,7 +20,7 @@ SDCARD_IMG="sdcard.img"
 SDCARD_SRC="../colibri-buildroot/output/sdcard"
 SDCARD_CONTENT=boot
 SDCARD_PARTNUM=1
-FABUI_SRC="../colibri-fabui"
+#~ FABUI_SRC="../colibri-fabui"
 
 while (( "$#" )); do
 	case $1 in
@@ -40,13 +40,17 @@ while (( "$#" )); do
 			shift
 			SDCARD_PARTNUM=$1
 			;;
-		-fabui_src)
+		-external_bundles_root)
 			shift
-			FABUI_SRC=$1
+			EXTERNAL_BUNDLES_ROOT=$1
 			;;
 		-content)
 			shift
 			SDCARD_CONTENT=$1
+			;;
+		-bundle)
+			shift
+			BUNDLE_PREFIX=$1
 			;;
 		*)
 			echo "Unknown parameter \'$1\'"
@@ -101,9 +105,13 @@ case $SDCARD_CONTENT in
 			cp -R sdcard/* $MNT
 		fi
 		
-		# Copy FABUI bundle
-		cp -LRf $FABUI_SRC/*.cb $MNT/bundles/
-		cp -LRf $FABUI_SRC/*.cb.md5sum $MNT/bundles/
+		# Copy external bundles
+		if [ -n "${EXTERNAL_BUNDLES_ROOT}" ]; then
+			echo "EXTERNAL_BUNDLES_ROOT" ${EXTERNAL_BUNDLES_ROOT}
+			cp -LRf $EXTERNAL_BUNDLES_ROOT/*.cb $MNT/
+			cp -LRf $EXTERNAL_BUNDLES_ROOT/*.cb.md5sum $MNT/
+		fi
+		
 		du -sh $MNT
 		;;
 	earlyboot)
@@ -130,11 +138,20 @@ case $SDCARD_CONTENT in
 			cp -R sdcard/bundles/* $MNT/
 		fi
 		
-		# Copy FABUI bundle
-		cp -LRf $FABUI_SRC/*.cb $MNT/
-		cp -LRf $FABUI_SRC/*.cb.md5sum $MNT/
+		# Copy external bundles
+		if [ -n "${EXTERNAL_BUNDLES_ROOT}" ]; then
+			cp -LRf $EXTERNAL_BUNDLES_ROOT/*.cb $MNT/
+			cp -LRf $EXTERNAL_BUNDLES_ROOT/*.cb.md5sum $MNT/
+		fi
 		
 		du -sh $MNT
+		;;
+	single-bundle)
+		# Remove old bundle
+		rm -rf $MNT/${BUNDLE_PREFIX}-*
+		# Copy new FABUI bundle
+		cp -R ${EXTERNAL_BUNDLES_ROOT}/${BUNDLE_PREFIX}-* $MNT
+		
 		;;
 	fabui)
 		# Remove old FABUI bundle

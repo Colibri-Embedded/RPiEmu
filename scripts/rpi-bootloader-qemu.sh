@@ -40,9 +40,15 @@ popd  > /dev/null
 
 . ${SCRIPT_PATH}/bootloaderlib.sh
 
+#~ QEMU_SYSTEM=/mnt/development/RPiEmu/build/host/bin/qemu-system-arm
+QEMU_SYSTEM=qemu-system-arm
+QEMU_MACHINE="-M versatilepb"
+QEMU_CPU="-cpu arm1176"
+#~ QEMU_MACHINE="-M raspi2"
+
 #NETWORK="-net nic -net user,hostfwd=tcp::50022-:22,hostfwd=tcp::80-:80"
-TAP_IFUP=${PWD}/qemu-ifup
-TAP_IFDOWN=${PWD}/qemu-ifdown
+TAP_IFUP=${SCRIPT_PATH}/qemu-ifup
+TAP_IFDOWN=${SCRIPT_PATH}/qemu-ifdown
 TAP_DEV=colibri0
 NETWORK="-net nic,model=smc91c111, -net tap,vlan=0,ifname=${TAP_DEV},script=${TAP_IFUP},downscript=${TAP_IFDOWN}"
 
@@ -85,7 +91,7 @@ while (( "$#" )); do
 done
 
 BOOT_DIR=$(mktemp -d)
-QEMU_ARGS="${SERIAL} -hda ${SDCARD_IMG} -clock dynticks -no-reboot -cpu arm1176 -m ${RAMSIZE} -M versatilepb ${NETWORK} ${USBDEV}"
+QEMU_ARGS="${SERIAL} -drive format=raw,file=${SDCARD_IMG} -clock dynticks -no-reboot -m ${RAMSIZE} ${QEMU_MACHINE} ${QEMU_CPU} ${NETWORK} ${USBDEV}"
 
 # Check if all the tools are available
 check_tools
@@ -94,12 +100,11 @@ check_tools
 copy_boot_from_sdimage $SDCARD_IMG $SDCARD_BOOT_PARTNUM $BOOT_DIR
 
 # Start qemu
-echo qemu-system-arm ${QEMU_ARGS} -append ${CMDLINE}
-qemu-system-arm ${QEMU_ARGS} -append "${CMDLINE}" 
+echo ${QEMU_SYSTEM} ${QEMU_ARGS} -append ${CMDLINE}
+${QEMU_SYSTEM} ${QEMU_ARGS} -append "${CMDLINE}" 
 
 # Cleanup the boot directory
 bootloader_cleanup $BOOT_DIR
 
 # Stop the model simulator
-kill -9 ${MODEL_PID}
-
+kill -9 ${MODEL_PID} &> /dev/null

@@ -1,0 +1,12 @@
+diff -Nuar linux-rpi-4.1.y.orig/drivers/media/v4l2-core/videobuf2-core.c linux-rpi-4.1.y/drivers/media/v4l2-core/videobuf2-core.c
+--- linux-rpi-4.1.y.orig/drivers/media/v4l2-core/videobuf2-core.c	2016-04-05 14:05:46.075428139 +0200
++++ linux-rpi-4.1.y/drivers/media/v4l2-core/videobuf2-core.c	2016-04-05 14:06:10.732007813 +0200
+@@ -1245,7 +1245,7 @@
+ 		return;
+ 
+ 	__check_once = true;
+-	__WARN();
++	//__WARN();
+ 
+ 	pr_warn_once("use of bytesused == 0 is deprecated and will be removed in the future,\n");
+ 	if (vb->vb2_queue->allow_zero_bytesused)

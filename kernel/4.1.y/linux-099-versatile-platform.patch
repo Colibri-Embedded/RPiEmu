@@ -1,0 +1,58 @@
+diff -Naur linux-rpi-4.4.y.orig/arch/arm/mach-versatile/Kconfig linux-rpi-4.4.y/arch/arm/mach-versatile/Kconfig
+--- linux-rpi-4.4.y.orig/arch/arm/mach-versatile/Kconfig	2016-04-04 13:38:04.699663683 +0200
++++ linux-rpi-4.4.y/arch/arm/mach-versatile/Kconfig	2016-04-04 13:43:35.539095509 +0200
+@@ -4,7 +4,6 @@
+ config ARCH_VERSATILE_PB
+ 	bool "Support Versatile Platform Baseboard for ARM926EJ-S"
+ 	default y
+-	select CPU_ARM926T
+ 	select MIGHT_HAVE_PCI
+ 	help
+ 	  Include support for the ARM(R) Versatile Platform Baseboard
+@@ -12,7 +11,6 @@
+ 
+ config MACH_VERSATILE_AB
+ 	bool "Support Versatile Application Baseboard for ARM926EJ-S"
+-	select CPU_ARM926T
+ 	help
+ 	  Include support for the ARM(R) Versatile Application Baseboard
+ 	  for the ARM926EJ-S.
+diff -Naur linux-rpi-4.4.y.orig/arch/arm/mm/Kconfig linux-rpi-4.4.y/arch/arm/mm/Kconfig
+--- linux-rpi-4.4.y.orig/arch/arm/mm/Kconfig	2016-04-04 13:38:04.598665380 +0200
++++ linux-rpi-4.4.y/arch/arm/mm/Kconfig	2016-04-04 13:45:10.445488933 +0200
+@@ -71,7 +71,7 @@
+ 
+ # ARM920T
+ config CPU_ARM920T
+-	bool "Support ARM920T processor" if (ARCH_MULTI_V4T && ARCH_INTEGRATOR)
++	bool "Support ARM920T processor" if (ARCH_MULTI_V4T && (ARCH_INTEGRATOR || ARCH_VERSATILE_PB || ARCH_VERSATILE_AB) )
+ 	select CPU_32v4T
+ 	select CPU_ABRT_EV4T
+ 	select CPU_CACHE_V4WT
+@@ -89,7 +89,7 @@
+ 
+ # ARM922T
+ config CPU_ARM922T
+-	bool "Support ARM922T processor" if (ARCH_MULTI_V4T && ARCH_INTEGRATOR)
++	bool "Support ARM922T processor" if (ARCH_MULTI_V4T && (ARCH_INTEGRATOR || ARCH_VERSATILE_PB || ARCH_VERSATILE_AB) )
+ 	select CPU_32v4T
+ 	select CPU_ABRT_EV4T
+ 	select CPU_CACHE_V4WT
+@@ -127,7 +127,7 @@
+ 
+ # ARM926T
+ config CPU_ARM926T
+-	bool "Support ARM926T processor" if (!ARCH_MULTIPLATFORM || ARCH_MULTI_V5) && (ARCH_INTEGRATOR || MACH_REALVIEW_EB)
++	bool "Support ARM926T processor" if (!ARCH_MULTIPLATFORM || ARCH_MULTI_V5) && (ARCH_INTEGRATOR || MACH_REALVIEW_EB || ARCH_VERSATILE_PB || ARCH_VERSATILE_AB)
+ 	select CPU_32v5
+ 	select CPU_ABRT_EV5TJ
+ 	select CPU_CACHE_VIVT
+@@ -358,7 +358,7 @@
+ 
+ # ARMv6
+ config CPU_V6
+-	bool "Support ARM V6 processor" if (!ARCH_MULTIPLATFORM || ARCH_MULTI_V6) && (ARCH_INTEGRATOR || MACH_REALVIEW_EB || MACH_REALVIEW_PBX || MACH_BCM2708)
++	bool "Support ARM V6 processor" if (!ARCH_MULTIPLATFORM || ARCH_MULTI_V6) && (ARCH_INTEGRATOR || MACH_REALVIEW_EB || MACH_REALVIEW_PBX || MACH_BCM2708 || ARCH_VERSATILE_PB || ARCH_VERSATILE_AB)
+ 	select CPU_32v6
+ 	select CPU_ABRT_EV6
+ 	select CPU_CACHE_V6

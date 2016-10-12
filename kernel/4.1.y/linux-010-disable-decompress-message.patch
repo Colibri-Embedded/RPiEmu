@@ -1,0 +1,18 @@
+diff -Naur linux-rpi-4.4.y.orig/arch/arm/boot/compressed/misc.c linux-rpi-4.4.y/arch/arm/boot/compressed/misc.c
+--- linux-rpi-4.4.y.orig/arch/arm/boot/compressed/misc.c	2016-04-05 01:10:19.655175075 +0200
++++ linux-rpi-4.4.y/arch/arm/boot/compressed/misc.c	2016-04-05 01:10:46.349710460 +0200
+@@ -158,11 +158,11 @@
+ 
+ 	arch_decomp_setup();
+ 
+-	putstr("Uncompressing Linux...");
++	//putstr("Uncompressing Linux...");
+ 	ret = do_decompress(input_data, input_data_end - input_data,
+ 			    output_data, error);
+ 	if (ret)
+ 		error("decompressor returned an error");
+-	else
+-		putstr(" done, booting the kernel.\n");
++	/*else
++		putstr(" done, booting the kernel.\n");*/
+ }
