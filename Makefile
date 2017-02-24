@@ -84,6 +84,9 @@ SDCARD_LOG				?=	sdcard.log
 PYTHON_BIN					?= python
 RPIEMU_RUN					?= ./rpiemu.py
 
+info:
+	echo $(KERNEL_CONFIG)
+
 check-root-permissions:
 	@echo -n "Checking for root permissions..."
 	@[ $(shell id -u) = 0 ] || exit 1
@@ -169,19 +172,28 @@ sdcard:
 		-colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-boot:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content boot -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 \
+	-content boot \
+	-colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-earlyboot:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content earlyboot -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 \
+	-content earlyboot \
+	-colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 
 update-bundles:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 -content bundles -colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 2 \
+	-external_bundles_root "$(EXTERNAL_BUNDLES)" \
+	-content bundles \
+	-colibri_sdcard $(COLIBRI_BUILDROOT_SDCARD)
 	
 enable-dbgconsole:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content enable-dbgconsole
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 \
+	-content enable-dbgconsole
 	
 disable-dbgconsole:
-	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 -content disable-dbgconsole
+	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 \
+	-content disable-dbgconsole
 
 help:
 	@echo "== Cleaning =="

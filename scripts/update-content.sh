@@ -12,7 +12,7 @@ cd `dirname ${SCRIPT_PATH}` > /dev/null
 SCRIPT_PATH=`pwd`;
 popd  > /dev/null
 ########################################################################
-. ${SCRIPT_PATH}/../rpi-qemu/bootloaderlib.sh
+. ${SCRIPT_PATH}/bootloaderlib.sh
 
 check_root $0
 
@@ -108,8 +108,8 @@ case $SDCARD_CONTENT in
 		# Copy external bundles
 		if [ -n "${EXTERNAL_BUNDLES_ROOT}" ]; then
 			echo "EXTERNAL_BUNDLES_ROOT" ${EXTERNAL_BUNDLES_ROOT}
-			cp -LRf $EXTERNAL_BUNDLES_ROOT/*.cb $MNT/
-			cp -LRf $EXTERNAL_BUNDLES_ROOT/*.cb.md5sum $MNT/
+			cp -v -LRf $EXTERNAL_BUNDLES_ROOT/*.cb $MNT/bundles
+			cp -v -LRf $EXTERNAL_BUNDLES_ROOT/*.cb.md5sum $MNT/bundles
 		fi
 		
 		du -sh $MNT

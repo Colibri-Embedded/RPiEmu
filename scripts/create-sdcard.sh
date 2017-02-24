@@ -11,7 +11,7 @@ cd `dirname ${SCRIPT_PATH}` > /dev/null
 SCRIPT_PATH=`pwd`;
 popd  > /dev/null
 ########################################################################
-. ${SCRIPT_PATH}/../rpi-qemu/bootloaderlib.sh
+. ${SCRIPT_PATH}/bootloaderlib.sh
 
 check_root $0
 
