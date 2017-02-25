@@ -12,7 +12,7 @@ unexport QMAKESPEC
 unexport TERMINFO
 unexport MACHINE
 
--include config.mk
+-include external.mk
 
 TOP_DIR			?= ${CURDIR}
 BUILD_DIR		?= $(TOP_DIR)/build
@@ -33,6 +33,8 @@ MODULES_STAMP = $(BUILD_DIR)/.modules_stamp
 
 
 .PHONY: all run sdcard check-root-permissions
+
+ifneq ($(EXTERNAL_MK),)
 
 all: $(BUNDLES_DIR)/002-kernel-modules-qemu.cb
 
@@ -194,6 +196,38 @@ enable-dbgconsole:
 disable-dbgconsole:
 	sudo $(SCRIPTS_DIR)/update-content.sh -sdimg $(SDCARD_IMG) -sdpart 1 \
 	-content disable-dbgconsole
+
+
+else
+
+#~ prepare:
+#~ 	@echo "EXTERNAL_MK=$(EXTERNAL_MK)" > external.mk
+
+notice:
+	@echo "== Your emulator project has not been initialized yet. =="
+	@echo 
+	@echo "* You can start a fres new project by selection a non existing path"
+	@echo ">> make init DEST=<new project directory>"
+	@echo
+	@echo "or"
+	@echo 
+	@echo "* You can link an existing external project by selectin that path"
+	@echo ">> make init DEST=<existing project directory>"
+	@echo
+
+ifneq ($(DEST),)
+
+init:
+	@$(SCRIPTS_DIR)/initialize.sh $(DEST)
+	
+else
+
+init:
+	@echo "You need to provide a project destination path by using DEST."
+	
+endif
+
+endif
 
 help:
 	@echo "== Cleaning =="
